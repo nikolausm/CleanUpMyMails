@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UserSecretsId>095423d3-d94c-4244-b990-a2aa7e559242</UserSecretsId>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="ChilkatDnCore" Version="9.5.0.84" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CleanUpMyMails.Domain\CleanUpMyMails.Domain.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="appsettings.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.2" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Program.cs">
+        <IncludeInPackage>false</IncludeInPackage>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+</Project>
