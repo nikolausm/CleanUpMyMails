@@ -34,6 +34,13 @@ namespace CleanUpMyMails
 			{
 				connection.Connect();
 
+				foreach(var email in new LatestEmails(connection, 10))
+				{
+					Console.WriteLine($"Email from: {email.From}");
+					Console.WriteLine($"Subject: {email.Subject}");
+				}
+
+				Console.ReadKey();
 			}
 		}
 	}

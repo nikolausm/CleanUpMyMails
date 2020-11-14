@@ -4,47 +4,47 @@ using Chilkat;
 
 namespace CleanUpMyMails.Domain
 {
-	public class ImapConnection : IDisposable
+	public class ImapConnection : IImapConnection
 	{
 		private readonly IImapConfiguration imapConfiguration;
-		private readonly Imap imap;
 		private bool connected;
 
 		public ImapConnection(IImapConfiguration imapConfiguration)
 		{
 			this.imapConfiguration = imapConfiguration ?? throw new ArgumentNullException(nameof(imapConfiguration));
-			imap = new Chilkat.Imap();
+			Connection = new Chilkat.Imap();
 			// Turn on session logging:
-			imap.KeepSessionLog = imapConfiguration.KeepSessionLog;
+			Connection.KeepSessionLog = imapConfiguration.KeepSessionLog;
 
 			// Connect to GMail
 			// Use TLS
-			imap.Ssl = imapConfiguration.Ssl;
-			imap.Port = imapConfiguration.Port;
+			Connection.Ssl = imapConfiguration.Ssl;
+			Connection.Port = imapConfiguration.Port;
 		}
 
+		public Imap Connection { get; }
 		public void Connect()
 		{
-			if(!imap.Connect("imap.gmail.com"))
+			if(!Connection.Connect("imap.gmail.com"))
 			{
-				throw new ImapConnectionException(imap.LastErrorText);
+				throw new ImapConnectionException(Connection.LastErrorText);
 			}
 
 			// Login
 			// Your login is typically your GMail email address.
-			if(!imap.Login(imapConfiguration.Username, imapConfiguration.Password))
+			if(!Connection.Login(imapConfiguration.Username, imapConfiguration.Password))
 			{
-				throw new ImapConnectionException(imap.LastErrorText);
+				throw new ImapConnectionException(Connection.LastErrorText);
 			}
 
 			// Select an IMAP mailbox
-			if(!imap.SelectMailbox("Inbox"))
+			if(!Connection.SelectMailbox("Inbox"))
 			{
-				throw new ImapConnectionException(imap.LastErrorText);
+				throw new ImapConnectionException(Connection.LastErrorText);
 			}
 
 			// Show the session log.
-			Debug.WriteLine(imap.SessionLog);
+			Debug.WriteLine(Connection.SessionLog);
 
 			// Disconnect from the IMAP server.
 			connected = true;
@@ -52,9 +52,9 @@ namespace CleanUpMyMails.Domain
 
 		public void Dispose()
 		{
-			if(connected && !imap.Disconnect())
+			if(connected && !Connection.Disconnect())
 			{
-				throw new ImapConnectionException(imap.LastErrorText);
+				throw new ImapConnectionException(Connection.LastErrorText);
 			}
 		}
 	}
