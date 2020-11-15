@@ -39,7 +39,7 @@ namespace CleanUpMyMails
 					Console.WriteLine($"Email from: {email.From}");
 					Console.WriteLine($"Subject: {email.Subject}");
 				}
-
+				Console.WriteLine("Press any key");
 				Console.ReadKey();
 			}
 		}

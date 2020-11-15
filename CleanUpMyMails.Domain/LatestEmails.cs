@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Chilkat;
 
 namespace CleanUpMyMails.Domain
@@ -10,34 +11,49 @@ namespace CleanUpMyMails.Domain
 	{
 		private readonly Imap connection;
 		private readonly int count;
+		private readonly int startIndex;
 
-		public LatestEmails(IImapConnection connection, int count)
+		public LatestEmails(IImapConnection connection, int count, int startIndex = -1)
 		{
 			this.connection = connection.Connection;
 			this.count = count;
+			this.startIndex = startIndex;
 		}
 
 
 
 		public IEnumerator<Email> GetEnumerator()
 		{
-			int emailSequentialNumber = connection.NumMessages;
+			int emailSequentialNumber = startIndex == -1 ? connection.NumMessages : startIndex;
 
 
-			int startIndex = (emailSequentialNumber - count) <= 0
-				? emailSequentialNumber
-				: emailSequentialNumber - count;
+			int currentStartIndex = (emailSequentialNumber - count) <= 0
+				? 1
+				: emailSequentialNumber - count + 1;
 
-			for(int i = startIndex; i <= emailSequentialNumber; i++)
+
+			var set = new MessageSet();
+			set.HasUids = false;
+
+
+			set.FromCompactString($"{currentStartIndex}:{connection.NumMessages}");
+			if(!set.LastMethodSuccess)
 			{
-				Email newestEmail = connection.FetchSingle(i, bUid: false);
-				if(!connection.LastMethodSuccess)
-				{
-					throw new LatestEmailsException("Error fetching email", connection.LastErrorText);
-				}
-
-				yield return newestEmail;
+				throw new LatestEmailsException("Error fetching email", connection.LastErrorText);
 			}
+
+			EmailBundle newestEmails = connection.FetchBundle(set);
+			if(!newestEmails.LastMethodSuccess)
+			{
+				throw new LatestEmailsException("Error fetching email", connection.LastErrorText);
+			}
+
+			for(int i = 0; i < newestEmails.MessageCount; i++)
+			{
+				yield return newestEmails.GetEmail(i);
+			}
+
+
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
